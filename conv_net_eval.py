@@ -66,19 +66,19 @@ def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
 if __name__=="__main__":
     mrppath = os.path.join(this_dir, "mr.p")
     x = cPickle.load(open(mrppath,"rb"))
-    revs, W, word_idx_map, vocab, numclasses = x[0], x[1], x[2], x[3], x[4]            
-    U = W
+    revs, W, word_idx_map, vocab, numclasses, W2 = x[0], x[1], x[2], x[3], x[4] , x[5]
+    U = W2
     classifierpath = os.path.join(this_dir, "classifier.save")
     savedparams = cPickle.load(open(classifierpath,'rb'))
-    datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=300, filter_h=5)
+    datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=25, filter_h=5)
     revsin = datasets[2]
     filter_hs=[3,4,5]
     conv_non_linear="relu"
-    hidden_units=[100,numclasses]
+    hidden_units=[25,numclasses]
     dropout_rate=[0.5]
     activations=[Iden]
     img_h = 70 + 4 + 4
-    img_w = 300
+    img_w = 25
     rng = np.random.RandomState(3435)
     batch_size=50
     filter_w = img_w    
