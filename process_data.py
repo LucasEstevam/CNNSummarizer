@@ -129,7 +129,7 @@ if __name__=="__main__":
     print "num words already in word2vec: " + str(len(w2v))
     rand_vecs = {}
     add_unknown_words(rand_vecs, vocab, k=25)
-    W2, _ = get_W(rand_vecs)
+    W2, _ = get_W(rand_vecs, k=25)
     add_unknown_words(w2v, vocab)
     W, word_idx_map = get_W(w2v)
     cPickle.dump([revs, W, word_idx_map, vocab, numclasses, W2], open("mr.p", "wb"))
