@@ -87,20 +87,18 @@ def get_idx_from_sent(sent, word_idx_map, max_l=51, filter_h=5):
         x.append(0)
     return x[:max_l+2*pad]
 
-def make_idx_data_cv(revs, word_idx_map, cv, max_l=51, k=300, filter_h=5):
+def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
     """
     Transforms sentences into a 2-d matrix.
     """
     train, test = [], []
     for rev in revs:
         sent = get_idx_from_sent(rev["text"], word_idx_map, max_l, k, filter_h)   
-        sent.append(rev["y"])
-        if rev["split"]==cv:            
-            test.append(sent)        
-        else:  
-            train.append(sent)   
+        sent.append(rev["y"])         
+        test.append(sent)        
+        train.append(sent)   
     train = np.array(train,dtype="int")
-    test = np.array(test,dtype="int")
+    test = np.array(test[1:100],dtype="int")
     return [train, test]     
 
 
@@ -112,7 +110,7 @@ if __name__=="__main__":
     U = W
     classifierpath = os.path.join(this_dir, "classifier.save")
     savedparams = cPickle.load(open(classifierpath,'rb'))
-
+    datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=300, filter_h=5)
     filter_hs=[3,4,5]
     conv_non_linear="relu"
     hidden_units=[100,numclasses]
@@ -156,8 +154,13 @@ if __name__=="__main__":
         conv_layer.params[1].set_value( savedparams[k+1])
         k = k + 2
 
+    test_set_x = datasets[0][:,:img_h] 
+    test_set_y = np.asarray(datasets[0][:,-1],"int32")
+
+
+
     test_pred_layers = []
-    test_size = 1
+    test_size = test_set_x.shape[0]
     test_layer0_input = Words[T.cast(x.flatten(),dtype="int32")].reshape((test_size,1,img_h,Words.shape[1]))
     for conv_layer in conv_layers:
         test_layer0_output = conv_layer.predict(test_layer0_input, test_size)
@@ -166,3 +169,5 @@ if __name__=="__main__":
     test_y_pred = classifier.predict_p(test_layer1_input)
     #test_error = T.mean(T.neq(test_y_pred, y))
     model = theano.function([x],test_y_pred,allow_input_downcast=True)
+    result = model(test_set_x)
+    
