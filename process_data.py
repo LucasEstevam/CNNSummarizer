@@ -4,7 +4,7 @@ from collections import defaultdict
 import sys, re
 import pandas as pd
 
-def build_data_cv(dataFiles, cv=10):
+def build_data_cv(dataFiles, cv=10, minVocab=5):
     """
     Loads data and splits into cv folds.
     """
@@ -35,6 +35,10 @@ def build_data_cv(dataFiles, cv=10):
                         revs.append(datum)
 
         y_ = y_ + 1
+
+    for k in vocab.keys():
+        if vocab[k] < minVocab:
+            del vocab[k]
 
     return revs, vocab, y_
     
@@ -85,6 +89,7 @@ def add_unknown_words(word_vecs, vocab, min_df=1, k=300):
     for word in vocab:
         if word not in word_vecs and vocab[word] >= min_df:
             word_vecs[word] = np.random.uniform(-0.25,0.25,k)  
+    word_vecs["UUUKKK"] = np.random.uniform(-0.25,0.25,k)  
 
 def clean_str(string):
     """
@@ -111,7 +116,7 @@ if __name__=="__main__":
     w2v_file = sys.argv[1]     
     data_folder = ["trump06.csv","trump07.csv","trump08.csv", "trump09.csv", "trump10.csv", "trump11.csv", "trump12.csv"]    
     print "loading data...",        
-    revs, vocab, y_ = build_data_cv(data_folder, cv=10)
+    revs, vocab, y_ = build_data_cv(data_folder, cv=10, minVocab=5)
     numclasses = y_
     max_l = np.max(pd.DataFrame(revs)["num_words"])
     print "data loaded!"

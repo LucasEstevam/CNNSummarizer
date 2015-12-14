@@ -259,6 +259,8 @@ def get_idx_from_sent(sent, word_idx_map, max_l=51, k=300, filter_h=5):
     for word in words:
         if word in word_idx_map:
             x.append(word_idx_map[word])
+        else:
+            x.append(word_idx_map["UUUKKK"])
     while len(x) < max_l+2*pad:
         x.append(0)
     return x[:max_l+2*pad]
@@ -266,7 +268,6 @@ def get_idx_from_sent(sent, word_idx_map, max_l=51, k=300, filter_h=5):
 def make_idx_data_cv(revs, word_idx_map, cv, max_l=51, k=300, filter_h=5):
     """
     Transforms sentences into a 2-d matrix.
-    """
     train, test = [], []
     for rev in revs:
         sent = get_idx_from_sent(rev["text"], word_idx_map, max_l, k, filter_h)   
