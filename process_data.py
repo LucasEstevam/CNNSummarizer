@@ -15,7 +15,13 @@ def build_data_cv(dataFiles, cv=10):
         with open(textfile, "rb") as f:
             for line in f:
                 if line != "":
-                    sentences = line.split(".")
+                    line = re.sub(r"Mr\.", "Mr", line)
+                    line = re.sub(r"Ms\.", "Ms", line)
+                    line = re.sub(r"Mrs\.", "Mrs", line)
+                    line = re.sub(r" ([A-Z])\. ", r" \1 ", line)
+                    line = re.sub(r" ([A-Z])\.([A-Z])\. ", r" \1\2 ", line)
+                    line = re.sub(r" ([A-Z])\.([A-Z])\.([A-Z])\. ", r" \1\2\3 ", line)
+                    sentences = re.compile("\.[^0-9]").split(line)
                     for sentence in sentences:   
                         clean_sentence = clean_str(sentence)                                     
                         words = set(clean_sentence.split())
@@ -97,7 +103,7 @@ def clean_str(string):
     string = re.sub(r"\(", " \( ", string) 
     string = re.sub(r"\)", " \) ", string) 
     string = re.sub(r"\?", " \? ", string) 
-    string = re.sub(r"\s{2,}", " ", string)    
+    string = re.sub(r"\s{2,}", " ", string)
     return string.strip().lower()
 
 
