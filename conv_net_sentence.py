@@ -290,7 +290,7 @@ def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
         test.append(sent)        
         train.append(sent)   
     train = np.array(train,dtype="int")
-    test = np.array(test,dtype="int")
+    test = np.array(test[1:100],dtype="int")
     return [train, test]     
 
    

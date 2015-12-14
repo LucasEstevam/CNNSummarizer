@@ -165,4 +165,4 @@ if __name__=="__main__":
     test_layer1_input = T.concatenate(test_pred_layers, 1)
     test_y_pred = classifier.predict_p(test_layer1_input)
     #test_error = T.mean(T.neq(test_y_pred, y))
-    self.model = theano.function([x],test_y_pred,allow_input_downcast=True)
+    model = theano.function([x],test_y_pred,allow_input_downcast=True)
