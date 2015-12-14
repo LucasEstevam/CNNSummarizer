@@ -26,51 +26,6 @@ def Iden(x):
     return(y)
 
 
-def load_bin_vec(fname, vocab):
-  """
-  Loads 300x1 word vecs from Google (Mikolov) word2vec
-  """
-  word_vecs = {}
-  with open(fname, "rb") as f:
-      header = f.readline()
-      vocab_size, layer1_size = map(int, header.split())
-      binary_len = np.dtype('float32').itemsize * layer1_size
-      for line in xrange(vocab_size):
-          word = []
-          while True:
-              ch = f.read(1)
-              if ch == ' ':
-                  word = ''.join(word)
-                  break
-              if ch != '\n':
-                  word.append(ch)   
-          if word in vocab:
-             word_vecs[word] = np.fromstring(f.read(binary_len), dtype='float32')  
-          else:
-              f.read(binary_len)
-  return word_vecs
-
-def clean_str(string, TREC=False):
-    """
-    Tokenization/string cleaning for all datasets except for SST.
-    Every dataset is lower cased except for TREC
-    """
-    string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)     
-    string = re.sub(r"\'s", " \'s", string) 
-    string = re.sub(r"\'ve", " \'ve", string) 
-    string = re.sub(r"n\'t", " n\'t", string) 
-    string = re.sub(r"\'re", " \'re", string) 
-    string = re.sub(r"\'d", " \'d", string) 
-    string = re.sub(r"\'ll", " \'ll", string) 
-    string = re.sub(r",", " , ", string) 
-    string = re.sub(r"!", " ! ", string) 
-    string = re.sub(r"\(", " \( ", string) 
-    string = re.sub(r"\)", " \) ", string) 
-    string = re.sub(r"\?", " \? ", string) 
-    string = re.sub(r"\s{2,}", " ", string)    
-    return string.strip().lower()
-
-
 def get_idx_from_sent(sent, word_idx_map, max_l=51, filter_h=5):
     """
     Transforms sentence into a list of indices. Pad with zeroes.
@@ -83,6 +38,8 @@ def get_idx_from_sent(sent, word_idx_map, max_l=51, filter_h=5):
     for word in words:
         if word in word_idx_map:
             x.append(word_idx_map[word])
+	else:
+	    x.append(word_idx_map["UUUKKK"])
     while len(x) < max_l+2*pad:
         x.append(0)
     return x[:max_l+2*pad]
@@ -174,7 +131,23 @@ if __name__=="__main__":
     #test_error = T.mean(T.neq(test_y_pred, y))
     pdb.set_trace()
     model = theano.function([x],test_y_pred,allow_input_downcast=True)
+    currentClass = 0
+    currentBestScore = 0
+    currentBestSentence = ""
     for i in range(0,test_set_x.shape[0]):
 	rev = revsin[i]
 	result = model(test_set_x[i,None])
+	scoresum = sum(result[0][0:currentClass+1])
+	if rev['y'] > currentClass:
+	    currentClass = rev['y']
+   	    currentBestScore = 0
+	    print "best for class" + str(currentClass)
+	    print currentBestSentence
+ 	    currentBestSentence = ""
+	if scoresum > currentBestScore:
+	    currentBestScore = scoresum
+    	    currentBestSentence = rev
+   
+    print "best for class" + str(currentClass)
+    print currentBestSentence
     
