@@ -17,7 +17,8 @@ import re
 import warnings
 import sys
 warnings.filterwarnings("ignore")   
-
+from conv_net_classes import LeNetConvPoolLayer
+from conv_net_classes import MLPDropout
 #different non-linearities
 def ReLU(x):
     y = T.maximum(0.0, x)
@@ -260,7 +261,7 @@ def get_idx_from_sent(sent, word_idx_map, max_l=51, k=300, filter_h=5):
             x.append(word_idx_map[word])
     while len(x) < max_l+2*pad:
         x.append(0)
-    return x
+    return x[:max_l+2*pad]
 
 def make_idx_data_cv(revs, word_idx_map, cv, max_l=51, k=300, filter_h=5):
     """
@@ -295,7 +296,7 @@ if __name__=="__main__":
     results = []
     r = range(0,10)    
     for i in r:
-        datasets = make_idx_data_cv(revs, word_idx_map, i, max_l=56,k=300, filter_h=5)
+        datasets = make_idx_data_cv(revs, word_idx_map, i, max_l=70,k=300, filter_h=5)
         perf, params = train_conv_net(datasets,
                               U,
                               lr_decay=0.95,
