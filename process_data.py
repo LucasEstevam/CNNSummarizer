@@ -106,7 +106,7 @@ if __name__=="__main__":
     data_folder = ["trump06.csv","trump07.csv","trump08.csv", "trump09.csv", "trump10.csv", "trump11.csv", "trump12.csv"]    
     print "loading data...",        
     revs, vocab, y_ = build_data_cv(data_folder, cv=10)
-    numclasses = y_ + 1
+    numclasses = y_
     max_l = np.max(pd.DataFrame(revs)["num_words"])
     print "data loaded!"
     print "number of sentences: " + str(len(revs))
