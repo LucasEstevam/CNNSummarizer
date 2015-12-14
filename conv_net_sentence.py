@@ -279,6 +279,20 @@ def make_idx_data_cv(revs, word_idx_map, cv, max_l=51, k=300, filter_h=5):
     test = np.array(test,dtype="int")
     return [train, test]     
   
+def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
+    """
+    Transforms sentences into a 2-d matrix.
+    """
+    train, test = [], []
+    for rev in revs:
+        sent = get_idx_from_sent(rev["text"], word_idx_map, max_l, k, filter_h)   
+        sent.append(rev["y"])         
+        test.append(sent)        
+        train.append(sent)   
+    train = np.array(train,dtype="int")
+    test = np.array(test,dtype="int")
+    return [train, test]     
+
    
 if __name__=="__main__":
     print "loading data...",
@@ -293,11 +307,8 @@ if __name__=="__main__":
         print "model architecture: CNN-static"
         non_static=False   
     U = W
-    results = []
-    r = range(0,10)    
-    for i in r:
-        datasets = make_idx_data_cv(revs, word_idx_map, i, max_l=70,k=300, filter_h=5)
-        perf, params = train_conv_net(datasets,
+    datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=300, filter_h=5)
+    perf, params = train_conv_net(datasets,
                               U,
                               lr_decay=0.95,
                               filter_hs=[3,4,5],
@@ -309,10 +320,6 @@ if __name__=="__main__":
                               non_static=non_static,
                               batch_size=50,
                               dropout_rate=[0.5])
-        if i == 9:
-            f = file('classifier.save', 'wb')
-            cPickle.dump([p.get_value() for p in params], f, protocol=cPickle.HIGHEST_PROTOCOL)
-            f.close()
-        print "cv: " + str(i) + ", perf: " + str(perf)
-        results.append(perf)  
-    print str(np.mean(results))
+    f = file('classifier.save', 'wb')
+    cPickle.dump([p.get_value() for p in params], f, protocol=cPickle.HIGHEST_PROTOCOL)
+    f.close()
