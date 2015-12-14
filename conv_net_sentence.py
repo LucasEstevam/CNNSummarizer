@@ -268,6 +268,7 @@ def get_idx_from_sent(sent, word_idx_map, max_l=51, k=300, filter_h=5):
 def make_idx_data_cv(revs, word_idx_map, cv, max_l=51, k=300, filter_h=5):
     """
     Transforms sentences into a 2-d matrix.
+    """
     train, test = [], []
     for rev in revs:
         sent = get_idx_from_sent(rev["text"], word_idx_map, max_l, k, filter_h)   
@@ -298,7 +299,7 @@ def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
 if __name__=="__main__":
     print "loading data...",
     x = cPickle.load(open("mr.p","rb"))
-    revs, W, word_idx_map, vocab, numclasses = x[0], x[1], x[2], x[3], x[4]
+    revs, W, word_idx_map, vocab, numclasses, W2 = x[0], x[1], x[2], x[3], x[4]
     print "data loaded!"
     mode= sys.argv[1]
     if mode=="-nonstatic":
@@ -307,14 +308,14 @@ if __name__=="__main__":
     elif mode=="-static":
         print "model architecture: CNN-static"
         non_static=False   
-    U = W
-    datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=300, filter_h=5)
+    U = W2
+    datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=25, filter_h=5)
     perf, params = train_conv_net(datasets,
                               U,
                               lr_decay=0.95,
                               filter_hs=[3,4,5],
                               conv_non_linear="relu",
-                              hidden_units=[100,numclasses], 
+                              hidden_units=[25,numclasses], 
                               shuffle_batch=True, 
                               n_epochs=25, 
                               sqr_norm_lim=9,
