@@ -92,14 +92,17 @@ def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
     Transforms sentences into a 2-d matrix.
     """
     train, test = [], []
+    revsin = []
     for rev in revs:
-        sent = get_idx_from_sent(rev["text"], word_idx_map, max_l, k, filter_h)   
-        sent.append(rev["y"])         
-        test.append(sent)        
-        train.append(sent)   
+	if rev['num_words'] > 5:
+            sent = get_idx_from_sent(rev["text"], word_idx_map, max_l, filter_h)   
+            sent.append(rev["y"])         
+            test.append(sent)        
+            train.append(sent)   
+	    revsin.append(rev)
     train = np.array(train,dtype="int")
     test = np.array(test[1:100],dtype="int")
-    return [train, test]     
+    return [train, test, revsin]     
 
 
    
@@ -111,6 +114,7 @@ if __name__=="__main__":
     classifierpath = os.path.join(this_dir, "classifier.save")
     savedparams = cPickle.load(open(classifierpath,'rb'))
     datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=300, filter_h=5)
+    revsin = datasets[2]
     filter_hs=[3,4,5]
     conv_non_linear="relu"
     hidden_units=[100,numclasses]
@@ -160,7 +164,7 @@ if __name__=="__main__":
 
 
     test_pred_layers = []
-    test_size = test_set_x.shape[0]
+    test_size = 1
     test_layer0_input = Words[T.cast(x.flatten(),dtype="int32")].reshape((test_size,1,img_h,Words.shape[1]))
     for conv_layer in conv_layers:
         test_layer0_output = conv_layer.predict(test_layer0_input, test_size)
@@ -168,6 +172,9 @@ if __name__=="__main__":
     test_layer1_input = T.concatenate(test_pred_layers, 1)
     test_y_pred = classifier.predict_p(test_layer1_input)
     #test_error = T.mean(T.neq(test_y_pred, y))
+    pdb.set_trace()
     model = theano.function([x],test_y_pred,allow_input_downcast=True)
-    result = model(test_set_x)
+    for i in range(0,test_set_x.shape[0]):
+	rev = revsin[i]
+	result = model(test_set_x[i,None])
     
