@@ -51,7 +51,7 @@ def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
     train, test = [], []
     revsin = []
     for rev in revs:
-	if rev['num_words'] > 5:
+	if rev['num_words'] > 8:
             sent = get_idx_from_sent(rev["text"], word_idx_map, max_l, filter_h)   
             sent.append(rev["y"])         
             test.append(sent)        
@@ -71,6 +71,7 @@ if __name__=="__main__":
     classifierpath = os.path.join(this_dir, "classifier.save")
     savedparams = cPickle.load(open(classifierpath,'rb'))
     mode2 = savedparams[1]
+    mode = savedparams[2]
     savedparams = savedparams[0]
     if mode2 == "-rand":
         hunits = 10
@@ -80,6 +81,8 @@ if __name__=="__main__":
 	hunits = 100
 	dims = 300
 	U = W
+    if mode == "-nonstatic":
+        U = savedparams[-1]
     datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=dims, filter_h=5)
     revsin = datasets[2]
     filter_hs=[3,4,5]

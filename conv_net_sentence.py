@@ -299,7 +299,7 @@ def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
 if __name__=="__main__":
     print "loading data...",
     x = cPickle.load(open("mr.p","rb"))
-    revs, W, word_idx_map, vocab, numclasses, W2 = x[0], x[1], x[2], x[3], x[4]
+    revs, W, word_idx_map, vocab, numclasses, W2 = x[0], x[1], x[2], x[3], x[4], x[5]
     print "data loaded!"
     mode= sys.argv[1]
     if mode=="-nonstatic":
@@ -312,6 +312,7 @@ if __name__=="__main__":
     datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=25, filter_h=5)
     perf, params = train_conv_net(datasets,
                               U,
+			      img_w=25,
                               lr_decay=0.95,
                               filter_hs=[3,4,5],
                               conv_non_linear="relu",

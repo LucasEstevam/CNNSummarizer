@@ -310,13 +310,13 @@ if __name__=="__main__":
         non_static=False  
     mode2 = sys.argv[2]
     if mode2=="-rand":
-	U = W2
-	dims = 25
+        U = W2
+        dims = 25       
         hunits = 10
     else:
-	U = W
-	dims = 300 
-	hunits = 100
+	    U = W
+	    dims = 300 
+	    hunits = 10
 
     datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=dims, filter_h=5)
     perf, params = train_conv_net(datasets,
@@ -333,5 +333,5 @@ if __name__=="__main__":
                               batch_size=50,
                               dropout_rate=[0.5])
     f = file('classifier.save', 'wb')
-    cPickle.dump([[p.get_value() for p in params],mode2], f, protocol=cPickle.HIGHEST_PROTOCOL)
+    cPickle.dump([[p.get_value() for p in params],mode2, mode], f, protocol=cPickle.HIGHEST_PROTOCOL)
     f.close()

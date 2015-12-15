@@ -21,6 +21,7 @@ def build_data_cv(dataFiles, cv=10, minVocab=5):
                     line = re.sub(r" ([A-Z])\. ", r" \1 ", line)
                     line = re.sub(r" ([A-Z])\.([A-Z])\. ", r" \1\2 ", line)
                     line = re.sub(r" ([A-Z])\.([A-Z])\.([A-Z])\. ", r" \1\2\3 ", line)
+                    line = re.sub(r" [0-9]+ ", " numberstr ", line)
                     sentences = line.split(".")
                     for sentence in sentences:   
                         clean_sentence = clean_str(sentence)                                     
