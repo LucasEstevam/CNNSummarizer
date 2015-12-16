@@ -38,8 +38,8 @@ def get_idx_from_sent(sent, word_idx_map, max_l=51, filter_h=5):
     for word in words:
         if word in word_idx_map:
             x.append(word_idx_map[word])
-	else:
-	    x.append(word_idx_map["UUUKKK"])
+    else:
+        x.append(word_idx_map["UUUKKK"])
     while len(x) < max_l+2*pad:
         x.append(0)
     return x[:max_l+2*pad]
@@ -51,12 +51,12 @@ def make_idx_data_all(revs, word_idx_map, max_l=51, k=300, filter_h=5):
     train, test = [], []
     revsin = []
     for rev in revs:
-	if rev['num_words'] > 8:
+        if rev['num_words'] > 8:
             sent = get_idx_from_sent(rev["text"], word_idx_map, max_l, filter_h)   
             sent.append(rev["y"])         
             test.append(sent)        
             train.append(sent)   
-	    revsin.append(rev)
+            revsin.append(rev)
     train = np.array(train,dtype="int")
     test = np.array(test[1:100],dtype="int")
     return [train, test, revsin]     
@@ -75,12 +75,12 @@ if __name__=="__main__":
     savedparams = savedparams[0]
     if mode2 == "-rand":
         hunits = 10
-	dims = 25
+        dims = 25
         U = W2
     else:
-	hunits = 100
-	dims = 300
-	U = W
+        hunits = 100
+        dims = 300
+        U = W
     if mode == "-nonstatic":
         U = savedparams[-1]
     datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=dims, filter_h=5)
@@ -148,19 +148,19 @@ if __name__=="__main__":
     currentBestScore = 0
     currentBestSentence = ""
     for i in range(0,test_set_x.shape[0]):
-	rev = revsin[i]
-	result = model(test_set_x[i,None])
-	scoresum = result[0][currentClass]
-	if rev['y'] > currentClass:
-	    currentClass = rev['y']
-	    scoresum = result[0][currentClass]
-   	    currentBestScore = 0
-	    print "best for class" + str(currentClass)
-	    print currentBestSentence
- 	    currentBestSentence = ""
-	if scoresum > currentBestScore:
-	    currentBestScore = scoresum
-    	    currentBestSentence = rev
+        rev = revsin[i]
+        result = model(test_set_x[i,None])
+        scoresum = result[0][currentClass]
+        if rev['y'] > currentClass:
+            currentClass = rev['y']
+            scoresum = result[0][currentClass]
+            currentBestScore = 0
+            print "best for class" + str(currentClass)
+            print currentBestSentence
+            currentBestSentence = ""
+        if scoresum > currentBestScore:
+            currentBestScore = scoresum
+            currentBestSentence = rev
     print "best for class" + str(currentClass)
     print currentBestSentence
     
