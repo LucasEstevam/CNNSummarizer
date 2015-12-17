@@ -10,6 +10,7 @@ import pdb
 from conv_net_classes import LeNetConvPoolLayer
 from conv_net_classes import MLPDropout
 import os
+import csv
 this_dir, this_filename = os.path.split(__file__)
 
 def ReLU(x):
@@ -78,7 +79,7 @@ if __name__=="__main__":
         dims = 25
         U = W2
     else:
-        hunits = 100
+        hunits = 25
         dims = 300
         U = W
     if mode == "-nonstatic":
@@ -147,20 +148,37 @@ if __name__=="__main__":
     currentClass = 0
     currentBestScore = 0
     currentBestSentence = ""
-    for i in range(0,test_set_x.shape[0]):
-        rev = revsin[i]
-        result = model(test_set_x[i,None])
-        scoresum = result[0][currentClass]
-        if rev['y'] > currentClass:
-            currentClass = rev['y']
-            scoresum = result[0][currentClass]
-            currentBestScore = 0
-            print "best for class" + str(currentClass)
-            print currentBestSentence
-            currentBestSentence = ""
-        if scoresum > currentBestScore:
-            currentBestScore = scoresum
-            currentBestSentence = rev
-    print "best for class" + str(currentClass)
-    print currentBestSentence
-    
+    correct = 0
+    docMean = 0
+    docSent = 0
+    with open('output.csv', 'w') as fp:
+        writer = csv.writer(fp, delimiter=',')
+        writer.writerow(['class','score', 'sdscore','sentence'])
+        print "document " + str(currentClass)
+        for i in range(0,test_set_x.shape[0]):
+            rev = revsin[i]
+            result = model(test_set_x[i,None])
+            correctScore = result[0][rev['y']]
+            sdscore = np.std(result[0])
+            writer.writerow([rev['y'], correctScore, sdscore, rev['original']])
+            if correctScore  >= np.max(result[0]):
+                correct = correct + 1
+                #print rev['original']
+            if rev['y'] > currentClass:            
+                print "docMean: " + str(docMean/docSent)
+                if docMean/docSent > currentBestScore:
+                    currentBestScore = docMean/docSent
+                    currentBestSentence = currentClass
+                currentClass = rev['y']
+                docMean = correctScore
+                docSent = 1
+                print " "
+                print "document " + str(currentClass)
+            else:
+                docMean += correctScore
+                docSent += 1
+            #print rev['original'] +" - " + str(correctScore)
+        
+        print "correct: " + str(correct)
+        print str(currentBestScore)
+        print str(currentBestSentence)

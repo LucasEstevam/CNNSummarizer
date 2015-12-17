@@ -316,7 +316,7 @@ if __name__=="__main__":
     else:
 	    U = W
 	    dims = 300 
-	    hunits = 10
+	    hunits = 25
 
     datasets = make_idx_data_all(revs, word_idx_map, max_l=70, k=dims, filter_h=5)
     perf, params = train_conv_net(datasets,

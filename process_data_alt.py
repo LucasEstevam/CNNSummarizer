@@ -22,6 +22,10 @@ def build_data_cv(dataFiles, cv=10, minVocab=5):
                     line = re.sub(r" ([A-Z])\.([A-Z])\. ", r" \1\2 ", line)
                     line = re.sub(r" ([A-Z])\.([A-Z])\.([A-Z])\. ", r" \1\2\3 ", line)
                     line = re.sub(r" [0-9]+ ", " numberstr ", line)
+                    line = re.sub(r"i\.e\. ", "ie ", line)
+                    line = re.sub(r"Fla\. ", "Fla ", line)
+                    line = re.sub(r" [0-9]+,[0-9]* ", " numberstr ", line)
+                    line = re.sub(r" \$[0-9]+ ", " numberstr ", line)
                     sentences = line.split(".")
                     for sentence in sentences:   
                         clean_sentence = clean_str(sentence)                                     
@@ -116,14 +120,14 @@ if __name__=="__main__":
     w2v_file = sys.argv[1]     
     data_folder = ["trump06.csv","trump07.csv","trump08.csv", "trump09.csv", "trump10.csv", "trump11.csv", "trump12.csv"]    
     print "loading data...",        
-    revs, vocab, y_ = build_data_cv(data_folder, cv=10, minVocab=3)
+    revs, vocab, y_ = build_data_cv(data_folder, cv=10, minVocab=10)
     numclasses = y_
     max_l = np.max(pd.DataFrame(revs)["num_words"])
     print "data loaded!"
     print "number of sentences: " + str(len(revs))
     print "vocab size: " + str(len(vocab))
     print "max sentence length: " + str(max_l)
-    print "loading word2vec vectors...",
+    print "loading word2vec vectors..."
     w2v = load_bin_vec(w2v_file, vocab)
     print "word2vec loaded!"
     print "num words already in word2vec: " + str(len(w2v))
